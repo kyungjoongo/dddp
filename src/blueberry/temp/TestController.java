@@ -1,6 +1,7 @@
 package blueberry.temp;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,8 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import blueberry.common.PageUtil;
 import blueberry.user.UserVO;
 
-
-@SuppressWarnings({"rawtypes", "unused","unchecked"} )
+@SuppressWarnings({ "rawtypes", "unused", "unchecked" })
 @Controller
 @RequestMapping(value = "/test")
 public class TestController {
@@ -28,169 +28,199 @@ public class TestController {
 	@Autowired
 	private TestService service;
 
-	
-
 	@RequestMapping(value = "/selectAdminUser.do", method = RequestMethod.GET)
 	public ModelAndView listQuery(ModelMap model, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 
-		
 		List arrList = new ArrayList();
 		arrList = service.selectAdminUser();
 		mav.setViewName("/temp/list");
 		return mav;
 	}
-	
 
 	@RequestMapping(value = "/jqgridsssideExam.do", method = RequestMethod.GET)
 	public ModelAndView jqgridsssideExam(ModelMap model, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 
-		
 		List arrList = new ArrayList();
 		arrList = service.selectAdminUser();
 		mav.setViewName("/temp/jqgridsssideExam");
 		return mav;
 	}
+
+	@RequestMapping(value = "/showTables.do")
+	public ModelAndView showTables(ModelMap model, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		// [{Field=id, Type=int(11), Null=YES, Extra=, Key=MUL}
+		
+		List showableTableList = compareTableProperies("test002", "test007");
+		System.out.println("showableTableList-->" + showableTableList.toString());
+		mav.setViewName("/temp/showTables");
+		return mav;
+	}
+
 	
-	
-	@RequestMapping(value="/list.do")
+	/**
+	 * 두테이블 속성을 비교해 다를경우 해당 리스트를 반환.
+	 * @param tableNm1
+	 * @param tableNm2
+	 * @return
+	 */
+	public List compareTableProperies(String tableNm1, String tableNm2) {
+
+		// desc table002;
+		List<HashMap> colList1 = service.getColList("test002");
+
+		// desc table003;
+		List<HashMap> colList2 = service.getColList("test007");
+		// [{Field=id, Type=int(11), Null=YES, Extra=, Key=MUL}
+		boolean bTableCompareResultSame = false;
+		List showableTableList = new ArrayList();
+
+		// 컬럼 비교..
+		bTableCompareResultSame = equalLists(colList1, colList2);
+		System.out.println("bTableCompareResultSame-->" + bTableCompareResultSame);
+
+		// 컬럼이 동일하지 않은 경우 테이블을 보여주기 위해 테이블리스트에 더한다.
+		if (bTableCompareResultSame) {
+
+			showableTableList.add("test002");
+
+		}
+		return showableTableList;
+	}
+
+	public boolean equalLists(List<HashMap> a, List<HashMap> b) {
+		// Check for sizes and nulls
+		if ((a.size() != b.size()) || (a == null && b != null) || (a != null && b == null)) {
+			return false;
+		}
+		if (a == null && b == null)
+			return true;
+
+		// Sort and compare the two lists
+		/*
+		 * Collections.sort(a); Collections.sort(b);
+		 */
+		return a.equals(b);
+	}
+
+	@RequestMapping(value = "/list.do")
 	public @ResponseBody HashMap list(
-		
-		@RequestParam(value = "page", defaultValue = "1") int page,
-		@RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
-		@RequestParam(value = "sortOrder", defaultValue = "") String sortOrder,
-		@RequestParam(value = "sortColumnName", defaultValue = "") String sortColumnName
-		
-		
-		)
-		{
-	    	
+
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+			@RequestParam(value = "sortOrder", defaultValue = "") String sortOrder,
+			@RequestParam(value = "sortColumnName", defaultValue = "") String sortColumnName
+
+	) {
+
 		HashMap jsonObject = new HashMap();
 
-		
-		
 		int totalRowCount = service.selectAdminUserTotCnt();
-		
-		
+
 		PageUtil pu = new PageUtil(page, totalRowCount, pageSize, 10);
 		HashMap pagemap = new HashMap();
-		pagemap.put("startRow", (page-1)*pageSize);
-		//pagemap.put("endRow", pu.getEndRow());
-		
+		pagemap.put("startRow", (page - 1) * pageSize);
+		// pagemap.put("endRow", pu.getEndRow());
+
 		pagemap.put("pageSize", pageSize);
 		pagemap.put("sortOrder", sortOrder);
 		pagemap.put("sortColumnName", sortColumnName);
-		
-		String[] tempArr=null;
-		
-		String[] tempArr2= { "test", "test2"};
-		
+
+		String[] tempArr = null;
+
+		String[] tempArr2 = { "test", "test2" };
+
 		pagemap.put("tempArr", tempArr2);
-		
-		
-		List<HashMap> arrList= service.selectAdminUserPaging(pagemap);
-		
-		for (HashMap mapone : arrList){
-		    
-		  //  mapone
+
+		List<HashMap> arrList = service.selectAdminUserPaging(pagemap);
+
+		for (HashMap mapone : arrList) {
+
+			// mapone
 		}
-		
-		
+
 		jsonObject.put("pu", pu);
 		jsonObject.put("rows", arrList);
-		
-		
-		 /*total = response.TotalPages,
-		                page = request.page,
-		                records = response.TotalRecords,
-		                rows = response.Rows*/
-		
-		
+
+		/*
+		 * total = response.TotalPages, page = request.page, records =
+		 * response.TotalRecords, rows = response.Rows
+		 */
+
 		jsonObject.put("page", page);
-		int totalPageCnt  = pu.getTotalPageCount();
-		//占쎈꽅占쎄퉱 占쎈읂占쎌뵠筌욑옙
+		int totalPageCnt = pu.getTotalPageCount();
+		// 占쎈꽅占쎄퉱 占쎈읂占쎌뵠筌욑옙
 		jsonObject.put("total", totalPageCnt);
-		
-		//占쎈꽅占쎄퉱 占쎌쟿�굜遺얜굡占쎈뮞.
+
+		// 占쎈꽅占쎄퉱 占쎌쟿�굜遺얜굡占쎈뮞.
 		jsonObject.put("records", totalRowCount);
 		jsonObject.put("success", true);
-		
-		
+
 		System.out.println("list==============================>");
-		
-		return jsonObject; 
+
+		return jsonObject;
 	}
-	
-	
+
 	@RequestMapping(value = "/add.do", method = RequestMethod.POST)
-	public @ResponseBody HashMap add(
-			@ModelAttribute TestVO vo
-	) {
+	public @ResponseBody HashMap add(@ModelAttribute TestVO vo) {
 
 		ModelAndView mv = new ModelAndView();
 		HashMap jsonObject = new HashMap();
 
 		int result = service.add(vo);
-		
+
 		jsonObject.put("result", result);
-		return jsonObject; 
+		return jsonObject;
 	}
-	
-	
+
 	@RequestMapping(value = "/delete.do", method = RequestMethod.POST)
-	public @ResponseBody HashMap delete(
-			@RequestParam(value = "selectedRows") String  selectedRows
-			
+	public @ResponseBody HashMap delete(@RequestParam(value = "selectedRows") String selectedRows
+
 	) {
 
 		ModelAndView mv = new ModelAndView();
 		HashMap jsonObject = new HashMap();
-		
+
 		String[] arrSelectedRows = selectedRows.split(",");
 
-		int result=0;
-		for ( int i=0; i<arrSelectedRows.length; i++){
-		
+		int result = 0;
+		for (int i = 0; i < arrSelectedRows.length; i++) {
+
 			result = service.delete(arrSelectedRows[i]);
 		}
-		
+
 		jsonObject.put("result", result);
-		return jsonObject; 
+		return jsonObject;
 	}
-	
+
 	@RequestMapping(value = "/selectOne.do", method = RequestMethod.POST)
-	public @ResponseBody HashMap selectOne(
-			@RequestParam(value = "id") String  id
-			
+	public @ResponseBody HashMap selectOne(@RequestParam(value = "id") String id
+
 	) {
 
 		ModelAndView mv = new ModelAndView();
 		HashMap jsonObject = new HashMap();
 		HashMap map = service.selectOne(id);
-		
+
 		jsonObject.put("result", map);
-		return jsonObject; 
+		return jsonObject;
 	}
-	
+
 	@RequestMapping(value = "/update.do", method = RequestMethod.POST)
-	public @ResponseBody HashMap update(
-			@ModelAttribute TestVO vo
-	) {
+	public @ResponseBody HashMap update(@ModelAttribute TestVO vo) {
 
 		ModelAndView mv = new ModelAndView();
 		HashMap jsonObject = new HashMap();
 		int result = service.update(vo);
 		jsonObject.put("result", result);
-		return jsonObject; 
+		return jsonObject;
 	}
-	
+
 	@RequestMapping(value = "/updateCells.do", method = RequestMethod.POST)
-	public @ResponseBody HashMap updateCells(
-			@RequestParam(value = "id") Integer id,
-		    @RequestParam(value = "cellName") String cellName,
-		    @RequestParam(value = "cellValue") String cellValue 
-	) {
+	public @ResponseBody HashMap updateCells(@RequestParam(value = "id") Integer id,
+			@RequestParam(value = "cellName") String cellName, @RequestParam(value = "cellValue") String cellValue) {
 
 		ModelAndView mv = new ModelAndView();
 		HashMap jsonObject = new HashMap();
@@ -198,55 +228,49 @@ public class TestController {
 		valueMap.put("id", id);
 		valueMap.put("colNm", cellName);
 		valueMap.put("value", cellValue);
-		
+
 		int result = service.updateCell(valueMap);
 		jsonObject.put("result", result);
-		
+
 		return jsonObject;
-		
+
 	}
-	
+
 	@RequestMapping(value = "/getGrid.do")
 	public @ResponseBody HashMap getGrid(
-			//@RequestParam(value = "id") String  id
-			
+	// @RequestParam(value = "id") String id
+
 	) {
 
 		ModelAndView mv = new ModelAndView();
 		HashMap JsonObject = new HashMap();
 		HashMap valueMap = new HashMap();
-		List arrList=new ArrayList();
-		/*'Author',
-		 'Title', 'Manufacturer', 'ProductGroup', 'DetailPageURL' */
+		List arrList = new ArrayList();
+		/*
+		 * 'Author', 'Title', 'Manufacturer', 'ProductGroup', 'DetailPageURL'
+		 */
 		valueMap.put("Author", "고경준");
 		valueMap.put("Title", "고경준은 천재인가");
 		valueMap.put("Manufacturer", "고경사");
 		valueMap.put("ProductGroup", "geniusGroup");
 		valueMap.put("DetailPageURL", "http://kyungjoongo.com");
-		
+
 		arrList.add(valueMap);
-		
-		
+
 		HashMap valueMap2 = new HashMap();
-		
+
 		valueMap2.put("Author", "고경준2");
 		valueMap2.put("Title", "고경준은 천재인가123");
 		valueMap2.put("Manufacturer", "고경사23");
 		valueMap2.put("ProductGroup", "geniusGrou2323p");
 		valueMap2.put("DetailPageURL", "http://kyungjoongo.com2323");
-		
-		
+
 		arrList.add(valueMap2);
-		
-		
-		
+
 		JsonObject.put("resultList", arrList);
 		JsonObject.put("total", arrList.size());
-		
-		return JsonObject; 
+
+		return JsonObject;
 	}
-
-
-
 
 }
