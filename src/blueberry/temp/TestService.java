@@ -35,6 +35,12 @@ public class TestService {
 		return totCnt;
 	}
 	
+	public List getColList(String tableNm)  {
+		
+		List arrList = dao.getColList(tableNm);
+		return arrList;
+	}
+	
 	
 	
 	public int add(TestVO vo)  {

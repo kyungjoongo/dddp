@@ -50,6 +50,15 @@ public class TestDao {
 		
 	}
 	
+	public List getColList(String tableNm){
+		
+		HashMap vmap=new HashMap();
+		vmap.put("tableNm", tableNm);
+		List arrList = sqlSessionTpl2.selectList("mysql.getColList", vmap);
+		
+		return arrList;
+	}
+	
 	//add
 	public int add(TestVO vo) {
 		int rslt = sqlSessionTpl2.insert("mysql.add",vo );
