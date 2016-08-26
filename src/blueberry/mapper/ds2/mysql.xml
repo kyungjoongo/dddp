@@ -61,6 +61,16 @@
 			 select count(*) as totCnt from admin_user order by id desc
 	</select>
 	
+	<select id="getColList" resultType="hashmap" parameterType="hashmap"  >  
+		
+			 desc ${tableNm}
+	</select>
+	
+	<select id="showTables2" resultType="hashmap">  
+		
+			 desc test002
+	</select>
+	
 	<insert id="add" parameterType="blueberry.temp.TestVO">  
 		
 			 INSERT INTO        ADMIN_USER (  USER_ID, USER_PASSWORD, NAME, ROLE ) 

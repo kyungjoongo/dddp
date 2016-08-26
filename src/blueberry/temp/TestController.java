@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -47,64 +48,18 @@ public class TestController {
 		mav.setViewName("/temp/jqgridsssideExam");
 		return mav;
 	}
-
-	@RequestMapping(value = "/showTables.do")
-	public ModelAndView showTables(ModelMap model, HttpServletRequest request) {
+	
+	@RequestMapping(value = "/list3.do", method = RequestMethod.GET)
+	public ModelAndView list3(ModelMap model, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
-		// [{Field=id, Type=int(11), Null=YES, Extra=, Key=MUL}
-		
-		List showableTableList = compareTableProperies("test002", "test007");
-		System.out.println("showableTableList-->" + showableTableList.toString());
-		mav.setViewName("/temp/showTables");
+
+		List arrList = new ArrayList();
+		arrList = service.selectAdminUser();
+		mav.setViewName("/temp/list3");
 		return mav;
 	}
-
 	
-	/**
-	 * 두테이블 속성을 비교해 다를경우 해당 리스트를 반환.
-	 * @param tableNm1
-	 * @param tableNm2
-	 * @return
-	 */
-	public List compareTableProperies(String tableNm1, String tableNm2) {
-
-		// desc table002;
-		List<HashMap> colList1 = service.getColList("test002");
-
-		// desc table003;
-		List<HashMap> colList2 = service.getColList("test007");
-		// [{Field=id, Type=int(11), Null=YES, Extra=, Key=MUL}
-		boolean bTableCompareResultSame = false;
-		List showableTableList = new ArrayList();
-
-		// 컬럼 비교..
-		bTableCompareResultSame = equalLists(colList1, colList2);
-		System.out.println("bTableCompareResultSame-->" + bTableCompareResultSame);
-
-		// 컬럼이 동일하지 않은 경우 테이블을 보여주기 위해 테이블리스트에 더한다.
-		if (bTableCompareResultSame) {
-
-			showableTableList.add("test002");
-
-		}
-		return showableTableList;
-	}
-
-	public boolean equalLists(List<HashMap> a, List<HashMap> b) {
-		// Check for sizes and nulls
-		if ((a.size() != b.size()) || (a == null && b != null) || (a != null && b == null)) {
-			return false;
-		}
-		if (a == null && b == null)
-			return true;
-
-		// Sort and compare the two lists
-		/*
-		 * Collections.sort(a); Collections.sort(b);
-		 */
-		return a.equals(b);
-	}
-
+	
 	@RequestMapping(value = "/list.do")
 	public @ResponseBody HashMap list(
 
@@ -162,6 +117,87 @@ public class TestController {
 
 		return jsonObject;
 	}
+	
+
+	@RequestMapping(value = "/showTables.do")
+	public @ResponseBody HashMap showTables(ModelMap model, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		HashMap jsonObject=new HashMap<>();
+		// [{Field=id, Type=int(11), Null=YES, Extra=, Key=MUL}
+		
+		
+		//ui에 보여줘야하는 테이블 리스트.
+		List<String> showableTableList = compareTableProperies("test002", "test007");
+		System.out.println("showableTableList-->" + showableTableList.toString());
+		
+		List<HashMap> colList2 =new ArrayList();
+		String tableNm = "";
+		
+		List<HashMap> newshowableTableList = new ArrayList();
+		for ( String _tableNm : showableTableList){
+			
+			//tableNm
+			colList2 = service.getColList(_tableNm);
+			
+			tableNm = _tableNm;
+			
+			HashMap tblPropertyMap = new HashMap();
+			tblPropertyMap.put("tableNm", _tableNm);
+			tblPropertyMap.put("colList", colList2);
+			
+			newshowableTableList.add(tblPropertyMap);
+			
+			System.out.println(_tableNm+ " ---->"+ colList2.toString());
+		}
+		
+		System.out.println("newshowableTableList-->"+ newshowableTableList);
+		jsonObject.put("newshowableTableList", newshowableTableList);
+		return jsonObject;
+	}
+
+
+	/**
+	 * 두테이블 속성을 비교해 다를경우 해당 리스트를 반환.
+	 * @param tableNm1
+	 * @param tableNm2
+	 * @return
+	 */
+	public List compareTableProperies(String tableNm1, String tableNm2) {
+
+		// desc table002;
+		List<HashMap> colList1 = service.getColList("test002");
+
+		// desc table003;
+		List<HashMap> colList2 = service.getColList("test007");
+		// [{Field=id, Type=int(11), Null=YES, Extra=, Key=MUL}
+		boolean bTableCompareResultSame = false;
+		List showableTableList = new ArrayList();
+
+		// 컬럼 비교..
+		bTableCompareResultSame = equalLists(colList1, colList2);
+		System.out.println("bTableCompareResultSame-->" + bTableCompareResultSame);
+
+		// 컬럼이 동일하지 않은 경우 테이블을 보여주기 위해 테이블리스트에 더한다.
+		if (bTableCompareResultSame) {
+
+			showableTableList.add(tableNm1);
+			showableTableList.add(tableNm2);
+
+		}
+		return showableTableList;
+	}
+
+	public boolean equalLists(List<HashMap> a, List<HashMap> b) {
+		// Check for sizes and nulls
+		if ((a.size() != b.size()) || (a == null && b != null) || (a != null && b == null)) {
+			return false;
+		}
+		if (a == null && b == null)
+			return true;
+		return a.equals(b);
+	}
+
+	
 
 	@RequestMapping(value = "/add.do", method = RequestMethod.POST)
 	public @ResponseBody HashMap add(@ModelAttribute TestVO vo) {

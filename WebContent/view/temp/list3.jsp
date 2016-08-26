@@ -23,37 +23,35 @@ display: none;
 <script>
 
 $(document).ready(function() {
-    $('#example').DataTable({
-    	 "language": {                "url": "./korean.lang"            }
-    	
-    	
+    
+	$.ajax({
+         type:"POST",
+         url:"${ctx}/test/showTables.do",
+         dataType:"JSON", 
+         success : function(data) {
+        	 
+        	 alert(data.toString());
+        	 
+        	 $.each(data.newshowableTableList, function (index, tableOne) {
+        		  console.log("tableNm-->"+ tableOne.tableNm);
+        		  $.each(tableOne.colList, function (index, colProperty) {
+        			  
+        			  console.log("Field-->"+ colProperty.Field);  
+        			  console.log("Type-->"+ colProperty.Type);
+        			  console.log("Null-->"+ colProperty.Null);
+        			  console.log("Key-->"+ colProperty.Key);
+        		  });
+        	 });
+               
+         },
+         error : function(xhr, status, error) {
+               alert("ERROR");
+         }
     });
-    
-    var table = $('#example').DataTable();
-    
-    $('#example tbody').on( 'click', 'tr', function () {
-        $(this).toggleClass('selected');
-    } );
-    
-    $('#btn1').click( function () {
-        alert( table.rows('.selected').data().length+' row(s) selected' );
-        
-        
-        var selected= table.rows('.selected').data();
-        
-        var selectedList = [];
-        
-        for (i = 0; i < selected.length; i++) {
-            
-        	
-        	//alert(selected[i][0]);
-        	
-        	selectedList.push(selected[i][0]);
-        }
-        
-        console.log(selectedList);
-        
-    } );
+	
+	
+	
+	
 } );
 	
 
@@ -67,47 +65,8 @@ $(document).ready(function() {
     
 <input type="button" value="btn1" id="btn1"></input>
 
-	<div style="width: 800px">
-	아이디:<input type="text" id="id"></input>
-    <table id="example" class="display" cellspacing="0" width="100%">
-        <thead>
-            <tr>
-            	
-            	<th>id</th>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
-            </tr>
-        </thead>
- 
-        <tbody>
-            <tr>
-            	
-            	<td>0</td>
-                <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
-                <td>2011/04/25</td>
-                <td>$320,800</td>
-            </tr>
-            <c:forEach begin="1" end="300" var="i">
-            <tr>
-            	
-            	 <td>${i}</td>
-            	 <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
-                <td>2011/04/25</td>
-                <td>$320,800</td>
-            </tr>
-            </c:forEach>
-         </tbody>
-</table>    
+<div style="width: 800px">
+	asdasdasdasdas
 </div>
 </body>
 </html>
