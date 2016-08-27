@@ -127,7 +127,7 @@ public class TestController {
 		
 		
 		//ui에 보여줘야하는 테이블 리스트.
-		List<String> showableTableList = compareTableProperies("test002", "test007");
+		List<String> showableTableList = compareTableProperies("test003", "test007");
 		System.out.println("showableTableList-->" + showableTableList.toString());
 		
 		List<HashMap> colList2 =new ArrayList();
@@ -165,20 +165,20 @@ public class TestController {
 	public List compareTableProperies(String tableNm1, String tableNm2) {
 
 		// desc table002;
-		List<HashMap> colList1 = service.getColList("test002");
+		List<HashMap> colList1 = service.getColList(tableNm1);
 
 		// desc table003;
-		List<HashMap> colList2 = service.getColList("test007");
+		List<HashMap> colList2 = service.getColList(tableNm2);
 		// [{Field=id, Type=int(11), Null=YES, Extra=, Key=MUL}
-		boolean bTableCompareResultSame = false;
+		boolean bTablePropCompareResultSame = false;
 		List showableTableList = new ArrayList();
 
 		// 컬럼 비교..
-		bTableCompareResultSame = equalLists(colList1, colList2);
-		System.out.println("bTableCompareResultSame-->" + bTableCompareResultSame);
+		bTablePropCompareResultSame = equalLists(colList1, colList2);
+		System.out.println("bTableCompareResultSame-->" + bTablePropCompareResultSame);
 
 		// 컬럼이 동일하지 않은 경우 테이블을 보여주기 위해 테이블리스트에 더한다.
-		if (bTableCompareResultSame) {
+		if (!bTablePropCompareResultSame) {
 
 			showableTableList.add(tableNm1);
 			showableTableList.add(tableNm2);
