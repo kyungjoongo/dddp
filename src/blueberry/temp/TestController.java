@@ -135,12 +135,9 @@ public class TestController {
 		
 		List<HashMap> newshowableTableList = new ArrayList();
 		for ( String _tableNm : showableTableList){
-			
 			//tableNm
 			colList2 = service.getColList(_tableNm);
-			
 			tableNm = _tableNm;
-			
 			HashMap tblPropertyMap = new HashMap();
 			tblPropertyMap.put("tableNm", _tableNm);
 			tblPropertyMap.put("colList", colList2);
